@@ -18,6 +18,8 @@ class MainActivityGLLF : AppCompatActivity() {
     private lateinit var btnSiguienteGLLF: Button
     private lateinit var btnMostrarResultadoGLLF: Button
 
+    private var datosRecibidosGLLF: String = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_gllf)
@@ -48,34 +50,78 @@ class MainActivityGLLF : AppCompatActivity() {
         }
 
         btnMostrarResultadoGLLF.setOnClickListener {
-            val num1 = txtPrimerNumeroGLLF.text.toString().toIntOrNull() ?: 0
-            val num2 = txtSegundoNumeroGLLF.text.toString().toIntOrNull() ?: 0
-            
-            // Lógica para Potencia y Factorial
-            val potencia = Math.pow(num1.toDouble(), num2.toDouble()).toInt()
-            val factorial = calcularFactorialGLLF(num1)
+            if (datosRecibidosGLLF.isNotEmpty()) {
+                val partesGLLF = datosRecibidosGLLF.split(";")
+                if (partesGLLF.size >= 4) {
+                    val nom = partesGLLF[0]
+                    val ape = partesGLLF[1]
+                    val n1Str = partesGLLF[2]
+                    val n2Str = partesGLLF[3]
 
-            txtPotenciaGLLF.setText("$potencia")
-            txtFactorialGLLF.setText("$factorial")
+                    txtNombresGLLF.setText(nom)
+                    txtApellidosGLLF.setText(ape)
+                    txtPrimerNumeroGLLF.setText(n1Str)
+                    txtSegundoNumeroGLLF.setText(n2Str)
+
+                    val num1 = n1Str.toIntOrNull() ?: 0
+                    val num2 = n2Str.toIntOrNull() ?: 0
+
+                    val multiplicacion = multiplicacionGLLF(num1, num2)
+                    val potencia = potenciaGLLF(num1, num2)
+                    val factorial = factorialGLLF(num1)
+
+                    txtMultiplicacionGLLF.setText("$multiplicacion")
+                    txtPotenciaGLLF.setText("$potencia")
+                    txtFactorialGLLF.setText("$factorial")
+                }
+            }
         }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 100 && resultCode == RESULT_OK && data != null) {
-            txtNombresGLLF.setText(data.getStringExtra("nombresGLLF") ?: "")
-            txtApellidosGLLF.setText(data.getStringExtra("apellidosGLLF") ?: "")
-            txtPrimerNumeroGLLF.setText(data.getStringExtra("dividendoGLLF") ?: "")
-            txtSegundoNumeroGLLF.setText(data.getStringExtra("divisorGLLF") ?: "")
-            txtMultiplicacionGLLF.setText(data.getStringExtra("numeroGLLF") ?: "")
+            datosRecibidosGLLF = data.getStringExtra("datosGLLF") ?: ""
+            
+            txtNombresGLLF.setText("")
+            txtApellidosGLLF.setText("")
+            txtPrimerNumeroGLLF.setText("")
+            txtSegundoNumeroGLLF.setText("")
+            txtMultiplicacionGLLF.setText("")
+            txtPotenciaGLLF.setText("")
+            txtFactorialGLLF.setText("")
+            
             btnMostrarResultadoGLLF.isEnabled = true
         }
     }
 
-    private fun calcularFactorialGLLF(n: Int): Long {
+    private fun multiplicacionGLLF(a: Int, b: Int): Int {
+        var resultado = 0
+        for (i in 1..b) {
+            resultado += a
+        }
+        return resultado
+    }
+
+    private fun potenciaGLLF(a: Int, b: Int): Int {
+        if (b == 0) return 1
+        var resultado = 1
+        for (i in 1..b) {
+            resultado = multiplicacionGLLF(resultado, a)
+        }
+        return resultado
+    }
+
+    private fun factorialGLLF(n: Int): Long {
+        if (n < 0) return 0
+        if (n == 0) return 1
         var resultado: Long = 1
         for (i in 1..n) {
-            resultado *= i
+            var temp: Long = 0
+            for (j in 1..i) {
+                temp += resultado
+            }
+            resultado = temp
         }
         return resultado
     }
